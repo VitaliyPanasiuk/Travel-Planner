@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     MAX_PLACES_PER_PROJECT: int = 10
     MIN_PLACES_PER_PROJECT: int = 1
     
+    API_CACHE_TTL_SECONDS: int = 3600
+    
     class Config:
         env_file = ".env"
         case_sensitive = True
