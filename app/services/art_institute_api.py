@@ -9,7 +9,7 @@ class ArtInstituteAPIService:
         self.base_url = settings.ART_INSTITUTE_API_BASE_URL
         self.timeout = 10.0
     
-    async def validate_place_exists(self, external_id: str) -> bool:
+    async def validate_place_exists(self, external_id: int) -> bool:
         """
         Validate that a place exists in the Art Institute API.
         

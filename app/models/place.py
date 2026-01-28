@@ -12,7 +12,7 @@ class Place(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
-    external_id = Column(String, nullable=False, index=True)
+    external_id = Column(Integer, nullable=False, index=True)
     notes = Column(String, nullable=True)
     is_visited = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

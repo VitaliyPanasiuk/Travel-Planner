@@ -1,4 +1,6 @@
-from sqlalchemy.orm import Session
+from __future__ import annotations
+
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
 from typing import List, Optional
 from datetime import date
@@ -28,13 +30,16 @@ class ProjectRepository:
             start_date=start_date
         )
         self.db.add(project)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(project)
         return project
     
-    def get_by_id(self, project_id: int) -> Optional[Project]:
-        """Get project by ID"""
-        return self.db.query(Project).filter(Project.id == project_id).first()
+    def get_by_id(self, project_id: int, load_places: bool = True) -> Optional[Project]:
+        """Get project by ID with optional eager loading of places"""
+        query = self.db.query(Project).filter(Project.id == project_id)
+        if load_places:
+            query = query.options(joinedload(Project.places))
+        return query.first()
     
     def get_all(
         self,
@@ -78,7 +83,7 @@ class ProjectRepository:
             page = 1
             page_size = total if total > 0 else 1
         
-        items = query.all()
+        items = query.options(joinedload(Project.places)).all()
         total_pages = ceil(total / page_size) if page_size > 0 else 0
         
         return PaginatedResponse(
@@ -111,7 +116,7 @@ class ProjectRepository:
             if value is not None:
                 setattr(project, field, value)
         
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(project)
         return project
     
@@ -128,13 +133,13 @@ class ProjectRepository:
             return False
         
         self.db.delete(project)
-        self.db.commit()
+        self.db.flush()
         return True
     
     def update_completion_status(self, project: Project) -> Project:
         """Update project completion status based on places"""
         project.is_completed = project.check_completion()
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(project)
         return project
     

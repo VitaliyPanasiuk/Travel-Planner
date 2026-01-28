@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from typing import List, Optional
@@ -17,7 +19,7 @@ class PlaceRepository:
     def create(
         self,
         project_id: int,
-        external_id: str,
+        external_id: int,
         notes: Optional[str] = None
     ) -> Place:
         """Create a new place in project"""
@@ -27,7 +29,7 @@ class PlaceRepository:
             notes=notes
         )
         self.db.add(place)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(place)
         return place
     
@@ -35,7 +37,7 @@ class PlaceRepository:
         """Get place by ID within a project"""
         return self.db.query(Place).filter(
             and_(
-                Place.id == place_id,
+                Place.external_id == place_id,
                 Place.project_id == project_id
             )
         ).first()
@@ -106,7 +108,7 @@ class PlaceRepository:
             if value is not None:
                 setattr(place, field, value)
         
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(place)
         return place
     
